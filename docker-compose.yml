@@ -1,0 +1,55 @@
+# ========================================
+# Prmpt - Docker Compose Configuration
+# ========================================
+# 12-Factor App Compliant:
+#   - Config via environment variables
+#   - Stateless processes
+#   - Port binding
+#   - Logs to stdout/stderr
+# ========================================
+
+services:
+  # ---- Backend Service ----
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: prmpt-backend
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    environment:
+      # App Config
+      - DEBUG=${DEBUG:-false}
+      - PORT=8000
+      # Supabase
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      # AI Providers
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - XAI_API_KEY=${XAI_API_KEY}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # ---- Frontend Service (Uncomment when frontend is available) ----
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: prmpt-frontend
+  #   ports:
+  #     - "${FRONTEND_PORT:-3000}:3000"
+  #   environment:
+  #     - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
+  #     - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+  #     - NEXT_PUBLIC_API_URL=http://backend:8000
+  #   depends_on:
+  #     backend:
+  #       condition: service_healthy
+  #   restart: unless-stopped

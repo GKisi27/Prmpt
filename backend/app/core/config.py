@@ -1,37 +1,39 @@
 """
 Configuration settings for Prmpt backend
+12-Factor App: Config loaded from environment variables
 """
-import os
 from typing import List
 from pydantic_settings import BaseSettings
-from dotenv import load_dotenv
-
-load_dotenv()
+from pydantic import Field
 
 
 class Settings(BaseSettings):
+    """Application settings loaded from environment variables."""
+    
     # App
     APP_NAME: str = "Prmpt"
-    DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
+    DEBUG: bool = False
     
-    # CORS
-    CORS_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ]
+    # CORS - comma-separated origins or JSON array
+    CORS_ORIGINS: List[str] = Field(
+        default=["http://localhost:3000", "http://127.0.0.1:3000"]
+    )
     
     # Supabase
-    SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
-    SUPABASE_SERVICE_KEY: str = os.getenv("SUPABASE_SERVICE_KEY", "")
+    SUPABASE_URL: str = ""
+    SUPABASE_SERVICE_KEY: str = ""
     
     # AI Providers
-    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
-    GOOGLE_AI_API_KEY: str = os.getenv("GOOGLE_AI_API_KEY", "")
-    ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
-    XAI_API_KEY: str = os.getenv("XAI_API_KEY", "")
+    OPENAI_API_KEY: str = ""
+    GOOGLE_AI_API_KEY: str = ""
+    ANTHROPIC_API_KEY: str = ""
+    XAI_API_KEY: str = ""
     
     class Config:
         env_file = ".env"
+        env_file_encoding = "utf-8"
+        case_sensitive = True
 
 
 settings = Settings()
+
