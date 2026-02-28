@@ -4,7 +4,7 @@ Prmpt Backend - FastAPI Application
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import judge, levels, user
+from app.api import judge, levels, user, admin
 from app.core.config import settings
 
 app = FastAPI(
@@ -26,6 +26,7 @@ app.add_middleware(
 app.include_router(judge.router, prefix="/api", tags=["Judge"])
 app.include_router(levels.router, prefix="/api", tags=["Levels"])
 app.include_router(user.router, prefix="/api", tags=["User"])
+app.include_router(admin.router, prefix="/api", tags=["Admin"])
 
 
 @app.get("/")

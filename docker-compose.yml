@@ -15,14 +15,16 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: prmpt-backend
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     environment:
       # App Config
       - DEBUG=${DEBUG:-false}
       - PORT=8000
-      # Supabase
-      - SUPABASE_URL=${SUPABASE_URL}
+      # Supabase (use host.docker.internal to reach Supabase on host)
+      - SUPABASE_URL=http://host.docker.internal:54321
       - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
       # AI Providers
       - OPENAI_API_KEY=${OPENAI_API_KEY}
@@ -42,11 +44,15 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+        - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://backend:8000}
     container_name: prmpt-frontend
     ports:
-      - "${FRONTEND_PORT:-5173}:80"
+      - "${FRONTEND_PORT:-3000}:3000"
     environment:
-      - VITE_API_URL=http://backend:${BACKEND_PORT:-8000}
+      - NEXT_PUBLIC_API_URL=http://backend:${BACKEND_PORT:-8000}
     depends_on:
       backend:
         condition: service_healthy
