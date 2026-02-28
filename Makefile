@@ -66,6 +66,21 @@ up-backend:
 logs-backend:
 	docker compose logs -f backend
 
+# Frontend only commands
+.PHONY: build-frontend up-frontend logs-frontend frontend-shell
+
+build-frontend:
+	docker compose build frontend
+
+up-frontend:
+	docker compose up -d frontend
+
+logs-frontend:
+	docker compose logs -f frontend
+
+frontend-shell:
+	docker compose exec frontend sh
+
 # Health check
 .PHONY: health
 
